@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import React, { useState, useRef } from 'react';
 import { collections, specialMutantApeTokens } from '../utils/constants';
 import { colorDistance } from '../utils/helpers';
@@ -7,6 +9,7 @@ import Loader from '../components/Loader';
 function NFTGenerator() {
   const [nftID, setNftID] = useState('');
   const [collection, setCollection] = useState(collections[0].address); // Set default to first collection
+  const [metadata, setMetadata] = useState(null);
   const [backgroundOption, setBackgroundOption] = useState('original'); // Track selected background option
   const [loading, setLoading] = useState(false);
   const twitterCanvasRef = useRef(null);
