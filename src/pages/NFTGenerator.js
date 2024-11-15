@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import React, { useState, useRef } from 'react';
 import { fetchNFTMetadata } from '../utils/api';
 import { collections, specialMutantApeTokens } from '../utils/constants';
