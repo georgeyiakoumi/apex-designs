@@ -1,6 +1,6 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
   try {
     const { collection, nftID } = JSON.parse(event.body);
 
@@ -15,7 +15,6 @@ exports.handler = async (event) => {
     const url = `https://eth-mainnet.alchemyapi.io/v2/${apiKey}/getNFTMetadata?contractAddress=${collection}&tokenId=${nftID}`;
 
     const response = await fetch(url);
-    const data = await response.json();
 
     if (!response.ok) {
       return {
@@ -23,6 +22,8 @@ exports.handler = async (event) => {
         body: JSON.stringify({ error: 'Failed to fetch metadata.' }),
       };
     }
+
+    const data = await response.json();
 
     return {
       statusCode: 200,
