@@ -3,8 +3,8 @@
 /* eslint-disable no-unused-vars */
 
 import React, { useState, useRef } from 'react';
-import CanvasPreview from '../components/CanvasPreview';
-import Loader from '../components/Loader';
+import CanvasPreview from '../components/CanvasPreview.js';
+import Loader from '../components/Loader.js';
 
 function NFTGenerator() {
   const [nftID, setNftID] = useState('');
