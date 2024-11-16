@@ -32,29 +32,29 @@ function NFTGenerator() {
       alert('Please select a collection and enter an NFT ID.');
       return;
     }
-  
+
     setLoading(true);
     setIsButtonDisabled(true); // Disable button after generating
     try {
       console.log('Sending to backend:', { collection, nftID }); // Log the request data
-  
+
       const response = await fetch('/.netlify/functions/fetchNFTMetadata', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ collection, nftID }),
       });
-  
+
       console.log('Received response from backend:', response); // Log the full response object
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Backend error response:', errorData); // Log backend error message
         throw new Error(errorData.error || 'Unknown error');
       }
-  
+
       const data = await response.json();
       console.log('Successfully fetched metadata:', data); // Log the successful data
-  
+
       setMetadata(data);
       generateImages(data);
     } catch (error) {
@@ -64,7 +64,6 @@ function NFTGenerator() {
       setLoading(false);
     }
   };
-  
 
   const generateImages = (data) => {
     const imageURL =
@@ -82,12 +81,15 @@ function NFTGenerator() {
       offscreenCanvas.width = nftImage.width;
       offscreenCanvas.height = nftImage.height;
       offscreenCtx.drawImage(nftImage, 0, 0);
+
       const topMiddleColor = offscreenCtx.getImageData(nftImage.width / 2, 0, 1, 1).data;
       const defaultBgColor = `#${((1 << 24) + (topMiddleColor[0] << 16) + (topMiddleColor[1] << 8) + topMiddleColor[2]).toString(16).slice(1)}`;
       const [r, g, b] = topMiddleColor;
+
       const tolerance = (collection === '0x60E4d786628Fea6478F785A6d7e704777c86a7c6' && specialMutantApeTokens.includes(nftID))
         ? 80
         : 50;
+
       const imageData = offscreenCtx.getImageData(0, 0, nftImage.width, nftImage.height);
       for (let i = 0; i < imageData.data.length; i += 4) {
         const pixelR = imageData.data[i];
@@ -98,19 +100,32 @@ function NFTGenerator() {
         }
       }
       offscreenCtx.putImageData(imageData, 0, 0);
+
+      const backgroundName = data.metadata.attributes.find(attr => attr.trait_type === 'Background')?.value;
+      const useWhiteLogo = [
+        'Purple', 'M1 Purple', 'M2 Purple', 'Army Green', 'New Punk Blue', 'M1 New Punk Blue', 'M2 New Punk Blue'
+      ].includes(backgroundName);
+
       backgroundOptions.forEach(option => {
-        drawOnCanvas('twitter', option, canvasRefs.current[`twitter${capitalize(option.name)}`], 1500, 500, defaultBgColor, nftImage, offscreenCanvas);
-        drawOnCanvas('mobile', option, canvasRefs.current[`mobile${capitalize(option.name)}`], 430, 932, defaultBgColor, nftImage, offscreenCanvas);
+        let logoSrc = option.logo;
+
+        // Override logo selection only for the original background
+        if (option.name === 'original') {
+          logoSrc = useWhiteLogo ? '/apechain-logo-white.svg' : '/apechain-logo-black.svg';
+        }
+
+        drawOnCanvas('twitter', option, canvasRefs.current[`twitter${capitalize(option.name)}`], 1500, 500, defaultBgColor, nftImage, offscreenCanvas, logoSrc);
+        drawOnCanvas('mobile', option, canvasRefs.current[`mobile${capitalize(option.name)}`], 430, 932, defaultBgColor, nftImage, offscreenCanvas, logoSrc);
       });
     };
   };
 
-  const drawOnCanvas = (type, option, canvas, width, height, defaultBgColor, nftImage, offscreenCanvas) => {
+  const drawOnCanvas = (type, option, canvas, width, height, defaultBgColor, nftImage, offscreenCanvas, logoSrc) => {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    let selectedBgColor = option.color || defaultBgColor;
-    let logoSrc = option.logo || '/apechain-logo-black.svg';
+    const selectedBgColor = option.color || defaultBgColor;
+
     if (specialMutantApeTokens.includes(nftID) && option.name === 'original') {
       const gradient = ctx.createRadialGradient(width / 2, height / 2, width / 4, width / 2, height / 2, width / 2);
       gradient.addColorStop(0, '#a9fd01');
@@ -120,6 +135,7 @@ function NFTGenerator() {
       ctx.fillStyle = selectedBgColor;
     }
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     const logo = new Image();
     logo.src = logoSrc;
     logo.onload = () => {
