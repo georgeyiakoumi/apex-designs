@@ -29,32 +29,42 @@ function NFTGenerator() {
 
   const handleGenerate = async () => {
     if (!collection || !nftID) {
-      alert("Please select a collection and enter an NFT ID.");
+      alert('Please select a collection and enter an NFT ID.');
       return;
     }
+  
     setLoading(true);
     setIsButtonDisabled(true); // Disable button after generating
     try {
+      console.log('Sending to backend:', { collection, nftID }); // Log the request data
+  
       const response = await fetch('/.netlify/functions/fetchNFTMetadata', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ collection, nftID }),
       });
-
+  
+      console.log('Received response from backend:', response); // Log the full response object
+  
       if (!response.ok) {
-        throw new Error('Failed to fetch metadata');
+        const errorData = await response.json();
+        console.error('Backend error response:', errorData); // Log backend error message
+        throw new Error(errorData.error || 'Unknown error');
       }
-
+  
       const data = await response.json();
-      setMetadata(data); // Use metadata if needed in other parts of your component
-      generateImages(data); // Proceed with generating the images
+      console.log('Successfully fetched metadata:', data); // Log the successful data
+  
+      setMetadata(data);
+      generateImages(data);
     } catch (error) {
-      console.error('Error fetching metadata:', error);
+      console.error('Error in handleGenerate:', error); // Log the full error
       alert('Failed to fetch metadata. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+  
 
   const generateImages = (data) => {
     const imageURL =
