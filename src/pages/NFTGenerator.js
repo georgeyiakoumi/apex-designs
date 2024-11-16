@@ -1,144 +1,137 @@
 /* eslint-disable no-unused-vars */
 
 import React, { useState, useRef } from 'react';
-import { fetchNFTMetadata } from '../utils/api';
-import { collections, specialMutantApeTokens } from '../utils/constants';
-import { colorDistance } from '../utils/helpers';
 import CanvasPreview from '../components/CanvasPreview';
 import Loader from '../components/Loader';
 
 function NFTGenerator() {
   const [nftID, setNftID] = useState('');
-  const [collection, setCollection] = useState('0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D'); // Default to Bored Ape
-  const [metadata, setMetadata] = useState(null);
-  const [backgroundOption, setBackgroundOption] = useState('original');
+  const [collection, setCollection] = useState('0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D'); // Default to BAYC
   const [loading, setLoading] = useState(false);
-  const twitterCanvasRef = useRef(null);
-  const mobileCanvasRef = useRef(null);
+  const [backgroundOption, setBackgroundOption] = useState('original'); // Default background option
+  const [metadata, setMetadata] = useState(null);
+  const twitterCanvasRef = useRef([]);
+  const mobileCanvasRef = useRef([]);
+
+  const backgroundOptions = ['original', 'white', 'black', 'apechain'];
 
   const handleGenerate = async () => {
-    if (!collection || !nftID) {
-      alert('Please select a collection and enter an NFT ID.');
+    if (!nftID || !collection) {
+      alert('Please enter an NFT ID and select a collection.');
       return;
     }
 
     setLoading(true);
     try {
-      const data = await fetchNFTMetadata(collection, nftID);
-      setMetadata(data);
-      generateImage(data);
+      const response = await fetch('/.netlify/functions/fetchNFTMetadata', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ collection, nftID }),
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        setMetadata(data);
+        generateImages(data);
+      } else {
+        alert('Failed to fetch metadata. Check the NFT ID or collection address.');
+      }
     } catch (error) {
       console.error('Error fetching metadata:', error);
-      alert('Failed to fetch metadata. Please try again.');
+      alert('An error occurred while fetching metadata.');
     } finally {
       setLoading(false);
     }
   };
 
-  const generateImage = (data) => {
-    const twitterCanvas = twitterCanvasRef.current;
-    const mobileCanvas = mobileCanvasRef.current;
-    const twitterCtx = twitterCanvas.getContext('2d');
-    const mobileCtx = mobileCanvas.getContext('2d');
-
-    if (!data || !data.metadata?.image) {
-      alert('No metadata or image available. Fetch metadata first!');
-      return;
-    }
-
-    const imageURL =
-      collection === '0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D'
-        ? `https://ipfs.io/ipfs/QmQ6VgRFiVTdKbiebxGvhW3Wa3Lkhpe6SkWBPjGnPkTttS/${nftID}.png`
-        : data.metadata.image.startsWith('ipfs://')
-        ? data.metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/')
-        : data.metadata.image;
-
+  const generateImages = (data) => {
+    const imageURL = data.metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/');
     const nftImage = new Image();
     nftImage.src = imageURL;
     nftImage.crossOrigin = 'Anonymous';
 
     nftImage.onload = () => {
-      const offscreenCanvas = document.createElement('canvas');
-      const offscreenCtx = offscreenCanvas.getContext('2d');
-      offscreenCanvas.width = nftImage.width;
-      offscreenCanvas.height = nftImage.height;
+      backgroundOptions.forEach((option, index) => {
+        const twitterCtx = twitterCanvasRef.current[index].getContext('2d');
+        const mobileCtx = mobileCanvasRef.current[index].getContext('2d');
 
-      offscreenCtx.drawImage(nftImage, 0, 0);
+        // Background and logo configurations based on selected option
+        let selectedBgColor = '#FFFFFF';
+        let logoSrc = '/apechain-logo-black.svg';
 
-      // Process the NFT image and draw on canvases
-      const drawOnCanvas = (canvas, ctx, width, height, fitToWidth, isTwitterCanvas = false) => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        const selectedBgColor = '#FFFFFF'; // Default background color for example
-
-        ctx.fillStyle = selectedBgColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        const logo = new Image();
-        logo.src = '/apechain-logo-black.svg';
-        logo.onload = () => {
-          const logoWidth = isTwitterCanvas ? 800 : 300;
-          const logoHeight = (294 / 859) * logoWidth;
-          ctx.drawImage(logo, (width - logoWidth) / 2, (height - logoHeight) / 2, logoWidth, logoHeight);
-
-          if (fitToWidth) {
-            const scaleFactor = width / nftImage.width;
-            const scaledWidth = width;
-            const scaledHeight = nftImage.height * scaleFactor;
-            ctx.drawImage(offscreenCanvas, 0, height - scaledHeight, scaledWidth, scaledHeight);
-          } else {
-            const scaleFactor = height / nftImage.height;
-            const scaledWidth = nftImage.width * scaleFactor;
-            const scaledHeight = height;
-            ctx.drawImage(offscreenCanvas, width - scaledWidth, 0, scaledWidth, scaledHeight);
+        if (option === 'white') {
+          selectedBgColor = '#FFFFFF';
+          logoSrc = '/apechain-logo-black.svg';
+        } else if (option === 'black') {
+          selectedBgColor = '#000000';
+          logoSrc = '/apechain-logo-white.svg';
+        } else if (option === 'apechain') {
+          selectedBgColor = '#0054FA';
+          logoSrc = '/apechain-logo-white.svg';
+        } else if (option === 'original') {
+          selectedBgColor = '#EDE9E6'; // Fallback for original background
+          const backgroundAttribute = data.metadata.attributes.find(attr => attr.trait_type === 'Background');
+          if (backgroundAttribute) {
+            selectedBgColor = backgroundAttribute.value;
           }
-        };
-      };
+        }
 
-      drawOnCanvas(twitterCanvas, twitterCtx, 1500, 500, false, true);
-      drawOnCanvas(mobileCanvas, mobileCtx, 430, 932, true, false);
+        const drawCanvas = (ctx, width, height) => {
+          ctx.clearRect(0, 0, width, height);
+          ctx.fillStyle = selectedBgColor;
+          ctx.fillRect(0, 0, width, height);
+
+          const logo = new Image();
+          logo.src = logoSrc;
+          logo.onload = () => {
+            const logoWidth = 200;
+            const logoHeight = 200;
+            ctx.drawImage(logo, (width - logoWidth) / 2, 20, logoWidth, logoHeight);
+
+            const scaleFactor = width / nftImage.width;
+            const scaledWidth = nftImage.width * scaleFactor;
+            const scaledHeight = nftImage.height * scaleFactor;
+            ctx.drawImage(nftImage, (width - scaledWidth) / 2, height - scaledHeight, scaledWidth, scaledHeight);
+          };
+        };
+
+        drawCanvas(twitterCtx, 1500, 500);
+        drawCanvas(mobileCtx, 430, 932);
+      });
     };
   };
 
   return (
     <div>
       <h1>NFT Generator</h1>
-
       <select value={collection} onChange={(e) => setCollection(e.target.value)}>
         <option value="0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D">Bored Ape Yacht Club</option>
         <option value="0x60E4d786628Fea6478F785A6d7e704777c86a7c6">Mutant Ape Yacht Club</option>
       </select>
-
       <input
         type="text"
         value={nftID}
         onChange={(e) => setNftID(e.target.value)}
         placeholder="Enter NFT ID"
       />
-
       <button onClick={handleGenerate} disabled={loading}>
         {loading ? 'Generating...' : 'Generate'}
       </button>
       {loading && <Loader />}
-
       <div className="canvas-container">
-        <CanvasPreview title="Twitter Banner Original" ref={twitterCanvasRef} width={1500} height={500} />
-        <CanvasPreview title="Mobile Original" ref={mobileCanvasRef} width={430} height={932} />
+        {backgroundOptions.map((option, index) => (
+          <CanvasPreview
+            key={option}
+            ref={(el) => {
+              twitterCanvasRef.current[index] = el;
+              mobileCanvasRef.current[index] = el;
+            }}
+            title={`Twitter (${option})`}
+            width={1500}
+            height={500}
+          />
+        ))}
       </div>
-
-      <a
-        href="https://www.x.com/iamsheftali"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{ marginTop: '20px', display: 'block', textAlign: 'center' }}
-      >
-        Follow me on X
-      </a>
-
-      <style jsx>{`
-        .canvas-container { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 20px; }
-        .responsive-canvas { width: 100%; max-width: 500px; height: auto; border: 1px solid #000; }
-      `}</style>
     </div>
   );
 }
