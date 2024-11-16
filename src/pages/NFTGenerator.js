@@ -86,9 +86,28 @@ function NFTGenerator() {
       const defaultBgColor = `#${((1 << 24) + (topMiddleColor[0] << 16) + (topMiddleColor[1] << 8) + topMiddleColor[2]).toString(16).slice(1)}`;
       const [r, g, b] = topMiddleColor;
 
+      const backgroundName = data.metadata.attributes.find(attr => attr.trait_type === 'Background')?.value;
+      const useWhiteLogo = [
+        'Purple', 'M1 Purple', 'M2 Purple', 'Army Green', 'New Punk Blue', 'M1 New Punk Blue', 'M2 New Punk Blue'
+      ].includes(backgroundName);
+
+      const backgroundToleranceMap = {
+        Yellow: 10,
+        Blue: 10,
+        Purple: 10,
+        Orange: 10,
+        Green: 10,
+        Grey: 10,
+        Aquamarine: 10,
+        'Army Green': 10,
+        'New Punk Blue': 10,
+
+      };
+      
       const tolerance = (collection === '0x60E4d786628Fea6478F785A6d7e704777c86a7c6' && specialMutantApeTokens.includes(nftID))
         ? 80
-        : 50;
+        : backgroundToleranceMap[backgroundName] || 50;
+        
 
       const imageData = offscreenCtx.getImageData(0, 0, nftImage.width, nftImage.height);
       for (let i = 0; i < imageData.data.length; i += 4) {
@@ -100,11 +119,6 @@ function NFTGenerator() {
         }
       }
       offscreenCtx.putImageData(imageData, 0, 0);
-
-      const backgroundName = data.metadata.attributes.find(attr => attr.trait_type === 'Background')?.value;
-      const useWhiteLogo = [
-        'Purple', 'M1 Purple', 'M2 Purple', 'Army Green', 'New Punk Blue', 'M1 New Punk Blue', 'M2 New Punk Blue'
-      ].includes(backgroundName);
 
       backgroundOptions.forEach(option => {
         let logoSrc = option.logo;
@@ -173,20 +187,23 @@ function NFTGenerator() {
 
   return (
     <div>
-      <h1>NFT Generator</h1>
-      <select value={collection} onChange={(e) => setCollection(e.target.value)}>
-        <option value="">Select Collection</option>
-        {collections.map((col) => (
-          <option key={col.address} value={col.address}>
-            {col.name}
-          </option>
-        ))}
-      </select>
-      <input type="text" value={nftID} onChange={handleNftIdChange} placeholder="Enter NFT ID" />
-      <button onClick={handleGenerate} disabled={loading || isButtonDisabled}>
-        {loading ? 'Generating...' : 'Generate'}
-      </button>
-      {loading && <Loader />}
+      <div className="options-container">
+        <header><h1>APECHAIN Banner Generator</h1></header>
+        <p>Enter your Ape ID then select from any of the export variants below. Works for mutants, too (Mega's included).</p>
+        <select value={collection} onChange={(e) => setCollection(e.target.value)}>
+          <option value="">Select Collection</option>
+          {collections.map((col) => (
+            <option key={col.address} value={col.address}>
+              {col.name}
+            </option>
+          ))}
+        </select>
+        <input className="ape-id" type="text" value={nftID} onChange={handleNftIdChange} placeholder="Enter Ape ID" />
+        <button onClick={handleGenerate} disabled={loading || isButtonDisabled}>
+          {loading ? 'Generating...' : 'Generate'}
+        </button>
+        {loading && <Loader />}
+      </div>
       <div className="canvas-container">
         {backgroundOptions.map(option => (
           <div key={option.name} style={{ marginBottom: '20px', textAlign: 'center' }}>
