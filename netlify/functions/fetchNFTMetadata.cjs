@@ -3,7 +3,6 @@ import fetch from 'node-fetch';
 export const handler = async (event) => {
   try {
     console.log('Incoming event:', event);
-
     const { collection, nftID } = JSON.parse(event.body);
     console.log('Parsed collection:', collection);
     console.log('Parsed nftID:', nftID);
