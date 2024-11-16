@@ -217,6 +217,7 @@ function NFTGenerator() {
               Download Twitter - {capitalize(option.name)}
             </button>
             <CanvasPreview
+              className={'wat'}
               title={`Mobile - ${capitalize(option.name)}`}
               ref={el => canvasRefs.current[`mobile${capitalize(option.name)}`] = el}
               width={430}

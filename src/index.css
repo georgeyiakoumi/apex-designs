@@ -68,12 +68,18 @@ code {
   align-items: center;
   gap: 20px;
   margin-top: 20px;
-  padding: 1rem;
-  box-sizing: border-box; /* Ensure padding is included in total width */
 }
 
-.canvas-container canvas {
-  width: calc(100% - 2rem); /* Full width minus 1rem padding on each side */
-  max-width: 100%; /* Prevent overflow */
-  height: auto; /* Maintain aspect ratio */
+/* Responsive styles for mobile */
+@media (max-width: 768px) {
+  .canvas-container {
+    padding: 1rem;
+    box-sizing: border-box; /* Ensure padding is included in total width */
+  }
+
+  .canvas-container canvas {
+    width: calc(100% - 2rem); /* Full width minus 1rem padding on each side */
+    max-width: 100%; /* Prevent overflow */
+    height: auto; /* Maintain aspect ratio */
+  }
 }
