@@ -1,6 +1,8 @@
-import fetch from 'node-fetch';
+import fetch from 'node-fetch'; // Use import if you have `"type": "module"` in package.json
+// If you're using CommonJS (without "type": "module"), stick to require:
+const fetch = require('node-fetch');
 
-export const handler = async (event) => {
+exports.handler = async (event) => {
   try {
     const { collection, nftID } = JSON.parse(event.body);
 
@@ -11,10 +13,11 @@ export const handler = async (event) => {
       };
     }
 
-    const apiKey = process.env.ALCHEMY_API_KEY;
+    const apiKey = process.env.REACT_APP_ALCHEMY_API_KEY;
     const url = `https://eth-mainnet.alchemyapi.io/v2/${apiKey}/getNFTMetadata?contractAddress=${collection}&tokenId=${nftID}`;
 
     const response = await fetch(url);
+    const data = await response.json();
 
     if (!response.ok) {
       return {
@@ -22,8 +25,6 @@ export const handler = async (event) => {
         body: JSON.stringify({ error: 'Failed to fetch metadata.' }),
       };
     }
-
-    const data = await response.json();
 
     return {
       statusCode: 200,
