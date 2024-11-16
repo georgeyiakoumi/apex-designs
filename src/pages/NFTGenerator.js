@@ -189,7 +189,7 @@ function NFTGenerator() {
     <div>
       <div className="options-container">
         <header><h1>APECHAIN Banner Generator</h1></header>
-        <p>Enter your Ape ID then select from any of the export variants below. Works for mutants, too (Mega's included).</p>
+        <p>Enter your Ape ID then select from any of the export variants below. Works for mutants, too (Mega's included).<br></br><br></br>- <a href="https://x.com/iamsheftali" aria-label="Sheftali on X" target="blank">@iamsheftali</a></p>
         <select value={collection} onChange={(e) => setCollection(e.target.value)}>
           <option value="">Select Collection</option>
           {collections.map((col) => (
