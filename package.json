@@ -11,10 +11,12 @@
     "axios": "^1.7.7",
     "fetch-blob": "^4.0.0",
     "node-fetch": "^3.3.2",
+    "normalize.css": "^8.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",
     "react-scripts": "5.0.1",
+    "sass": "^1.81.0",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

@@ -187,10 +187,14 @@ function NFTGenerator() {
   };
 
   return (
-    <div>
-      <div className="options-container">
+    <div className="generator-container">
+      <div className="left-column">
         <header><h1>APECHAIN Banner Generator</h1></header>
-        <p>Enter your Ape ID then select from any of the export variants below. Works for mutants, too (Mega's included).<br></br><br></br>- <a href="https://x.com/iamsheftali" aria-label="Sheftali on X" target="blank">@iamsheftali</a></p>
+        <p>
+          Enter your Ape ID then select from any of the export variants below.
+          Works for mutants, too (Mega's included).<br /><br />
+          - <a href="https://x.com/iamsheftali" aria-label="Sheftali on X" target="blank">@iamsheftali</a>
+        </p>
         <select value={collection} onChange={(e) => setCollection(e.target.value)}>
           <option value="">Select Collection</option>
           {collections.map((col) => (
@@ -205,33 +209,43 @@ function NFTGenerator() {
         </button>
         {loading && <Loader />}
       </div>
-      <div className="canvas-container">
-        {backgroundOptions.map(option => (
-          <div key={option.name} style={{ marginBottom: '20px', textAlign: 'center' }}>
-            <CanvasPreview
-              title={`Twitter - ${capitalize(option.name)}`}
-              ref={el => canvasRefs.current[`twitter${capitalize(option.name)}`] = el}
-              width={1500}
-              height={500}
-            />
-            <button onClick={() => downloadCanvas(canvasRefs.current[`twitter${capitalize(option.name)}`], `twitter-${option.name}.png`)}>
-              Download Twitter - {capitalize(option.name)}
-            </button>
-            <CanvasPreview
-              className={'wat'}
-              title={`Mobile - ${capitalize(option.name)}`}
-              ref={el => canvasRefs.current[`mobile${capitalize(option.name)}`] = el}
-              width={430}
-              height={932}
-            />
-            <button onClick={() => downloadCanvas(canvasRefs.current[`mobile${capitalize(option.name)}`], `mobile-${option.name}.png`)}>
-              Download Mobile - {capitalize(option.name)}
-            </button>
+      <div className="right-column">
+        <div className="canvas-container">
+          <div className="twitter-canvases">
+            {backgroundOptions.map(option => (
+              <div key={`${option.name}-twitter`} className="canvas-item">
+                <CanvasPreview
+                  title={`Twitter - ${capitalize(option.name)}`}
+                  ref={el => canvasRefs.current[`twitter${capitalize(option.name)}`] = el}
+                  width={1500}
+                  height={500}
+                />
+                <button onClick={() => downloadCanvas(canvasRefs.current[`twitter${capitalize(option.name)}`], `twitter-${option.name}.png`)}>
+                  Download Twitter - {capitalize(option.name)}
+                </button>
+              </div>
+            ))}
           </div>
-        ))}
+          <div className="mobile-canvases">
+            {backgroundOptions.map(option => (
+              <div key={`${option.name}-mobile`} className="canvas-item">
+                <CanvasPreview
+                  title={`Mobile - ${capitalize(option.name)}`}
+                  ref={el => canvasRefs.current[`mobile${capitalize(option.name)}`] = el}
+                  width={430}
+                  height={932}
+                />
+                <button onClick={() => downloadCanvas(canvasRefs.current[`mobile${capitalize(option.name)}`], `mobile-${option.name}.png`)}>
+                  Download Mobile - {capitalize(option.name)}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
+  
 }
 
 export default NFTGenerator;
