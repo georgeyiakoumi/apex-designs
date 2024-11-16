@@ -1,8 +1,6 @@
-import fetch from 'node-fetch'; // Use import if you have `"type": "module"` in package.json
-// If you're using CommonJS (without "type": "module"), stick to require:
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
   try {
     const { collection, nftID } = JSON.parse(event.body);
 
