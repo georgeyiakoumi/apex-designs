@@ -8,7 +8,7 @@ import Loader from '../components/Loader.js';
 function NFTGenerator() {
   const [nftID, setNftID] = useState('');
   const [collection, setCollection] = useState(collections[0].address); // Default to Bored Ape Yacht Club
-  const [metadata, setMetadata] = useState(null);
+  const [metadata, setMetadata] = useState(null); // eslint-disable-line no-unused-vars
   const [loading, setLoading] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false); // Track button state
   const canvasRefs = useRef({
