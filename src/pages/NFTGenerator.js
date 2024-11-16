@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* eslint-disable no-unused-vars */
 
 /* eslint-disable no-unused-vars */
@@ -165,6 +166,15 @@ function NFTGenerator() {
           </div>
         ))}
       </div>
+=======
+import React from 'react';
+
+function NFTGenerator() {
+  return (
+    <div>
+      <h1>NFT Generator</h1>
+      {/* Add content and functionality for the NFT generator */}
+>>>>>>> parent of 0e4c870 (adding the build)
     </div>
   );
 }
