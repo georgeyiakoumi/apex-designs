@@ -1,7 +1,7 @@
 {
   "name": "apex-designs",
   "version": "0.1.0",
-  "homepage": "/Home.js",
+  "homepage": "/",
   "type": "module",
   "private": true,
   "dependencies": {
