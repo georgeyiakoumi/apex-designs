@@ -1,11 +1,10 @@
-const fetch = require('node-fetch');
+// Using ES Modules syntax for node-fetch
+import fetch from 'node-fetch';
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
   try {
-    // Parse the incoming POST request body
     const { collection, nftID } = JSON.parse(event.body);
 
-    // Validate input
     if (!collection || !nftID) {
       return {
         statusCode: 400,
@@ -13,35 +12,25 @@ exports.handler = async (event) => {
       };
     }
 
-    // Retrieve the API key from Netlify environment variables
-    const apiKey = process.env.ALCHEMY_API_KEY;
-
-    // Construct the Alchemy API URL
+    const apiKey = process.env.REACT_APP_ALCHEMY_API_KEY; // Use the secret stored in Netlify
     const url = `https://eth-mainnet.alchemyapi.io/v2/${apiKey}/getNFTMetadata?contractAddress=${collection}&tokenId=${nftID}`;
 
-    // Fetch data from the Alchemy API
     const response = await fetch(url);
-
-    // Parse JSON response
     const data = await response.json();
 
-    // Handle non-successful response
     if (!response.ok) {
       return {
         statusCode: response.status,
-        body: JSON.stringify({ error: 'Failed to fetch metadata from Alchemy.' }),
+        body: JSON.stringify({ error: 'Failed to fetch metadata.' }),
       };
     }
 
-    // Return the fetched metadata
     return {
       statusCode: 200,
       body: JSON.stringify(data),
     };
   } catch (error) {
     console.error('Error in fetchNFTMetadata:', error);
-
-    // Return a 500 Internal Server Error if something goes wrong
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Internal server error.' }),
