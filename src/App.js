@@ -8,7 +8,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/nft-generator" element={<NFTGenerator />} />
+        <Route path="/apechain-banner-generator" element={<NFTGenerator />} />
       </Routes>
     </Router>
   );

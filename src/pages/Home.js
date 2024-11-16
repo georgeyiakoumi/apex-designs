@@ -6,7 +6,7 @@ function Home() {
   return (
     <div>
       <h1>Welcome to My Side Project</h1>
-      <Link to="/nft-generator">Go to NFT Generator</Link>
+      <Link to="/apechain-banner-generator">Go to APECHAIN Banner Generator</Link>
     </div>
   );
 }
