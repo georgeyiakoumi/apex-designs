@@ -70,6 +70,10 @@ code {
   margin-top: 20px;
 }
 
+canvas {
+  border: solid 0.0125rem #000;
+}
+
 /* Responsive styles for mobile */
 @media (max-width: 768px) {
   .canvas-container {

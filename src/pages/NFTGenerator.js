@@ -32,29 +32,29 @@ function NFTGenerator() {
       alert('Please select a collection and enter an NFT ID.');
       return;
     }
-
+  
     setLoading(true);
     setIsButtonDisabled(true); // Disable button after generating
     try {
       console.log('Sending to backend:', { collection, nftID }); // Log the request data
-
+  
       const response = await fetch('/.netlify/functions/fetchNFTMetadata', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ collection, nftID }),
+        body: JSON.stringify({ collection, nftID }), // No chain sent, backend determines it
       });
-
+  
       console.log('Received response from backend:', response); // Log the full response object
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Backend error response:', errorData); // Log backend error message
         throw new Error(errorData.error || 'Unknown error');
       }
-
+  
       const data = await response.json();
       console.log('Successfully fetched metadata:', data); // Log the successful data
-
+  
       setMetadata(data);
       generateImages(data);
     } catch (error) {
@@ -64,6 +64,7 @@ function NFTGenerator() {
       setLoading(false);
     }
   };
+  
 
   const generateImages = (data) => {
     const imageURL =
