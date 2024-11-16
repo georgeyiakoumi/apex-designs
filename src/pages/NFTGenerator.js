@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
 
+/* eslint-disable no-unused-vars */
+
 import React, { useState, useRef } from 'react';
 import CanvasPreview from '../components/CanvasPreview';
 import Loader from '../components/Loader';
@@ -101,6 +103,13 @@ function NFTGenerator() {
     };
   };
 
+  const downloadCanvas = (canvas, filename) => {
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = filename;
+    link.click();
+  };
+
   return (
     <div>
       <h1>NFT Generator</h1>
@@ -120,16 +129,40 @@ function NFTGenerator() {
       {loading && <Loader />}
       <div className="canvas-container">
         {backgroundOptions.map((option, index) => (
-          <CanvasPreview
-            key={option}
-            ref={(el) => {
-              twitterCanvasRef.current[index] = el;
-              mobileCanvasRef.current[index] = el;
-            }}
-            title={`Twitter (${option})`}
-            width={1500}
-            height={500}
-          />
+          <div key={option} className="canvas-wrapper">
+            <CanvasPreview
+              ref={(el) => {
+                twitterCanvasRef.current[index] = el;
+                mobileCanvasRef.current[index] = el;
+              }}
+              title={`Twitter (${option})`}
+              width={1500}
+              height={500}
+            />
+            <button
+              onClick={() =>
+                downloadCanvas(twitterCanvasRef.current[index], `twitter-${option}.png`)
+              }
+            >
+              Download Twitter ({option})
+            </button>
+            <CanvasPreview
+              ref={(el) => {
+                twitterCanvasRef.current[index] = el;
+                mobileCanvasRef.current[index] = el;
+              }}
+              title={`Mobile (${option})`}
+              width={430}
+              height={932}
+            />
+            <button
+              onClick={() =>
+                downloadCanvas(mobileCanvasRef.current[index], `mobile-${option}.png`)
+              }
+            >
+              Download Mobile ({option})
+            </button>
+          </div>
         ))}
       </div>
     </div>
