@@ -1,0 +1,15 @@
+[build]
+publish = "build" # Folder where your production build is generated
+command = "npm run build" # Command to build your project
+
+[functions]
+node_bundler = "esbuild" # Use esbuild for better ES module compatibility
+directory = "netlify/functions" # Path to your serverless functions folder
+
+[dev]
+framework = "create-react-app" # Optional: specify the dev framework for `netlify dev`
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
