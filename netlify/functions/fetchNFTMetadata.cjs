@@ -16,7 +16,7 @@ export const handler = async (event) => {
       };
     }
 
-    const apiKey = process.env.REACT_APP_ALCHEMY_API_KEY;
+    const apiKey = process.env.ALCHEMY_API;
     console.log('Using Alchemy API key:', apiKey ? 'Loaded' : 'Not loaded');
 
     const url = `https://eth-mainnet.alchemyapi.io/v2/${apiKey}/getNFTMetadata?contractAddress=${collection}&tokenId=${nftID}`;
