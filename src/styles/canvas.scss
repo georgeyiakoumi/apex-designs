@@ -1,0 +1,152 @@
+.generator-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    padding: 2rem;
+  
+    .left-column {
+      flex: 1;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+  
+      h1 {
+        font-size: 2rem;
+      }
+  
+      p {
+        font-size: 1rem;
+        line-height: 1.5;
+      }
+  
+      select,
+      input,
+      button {
+        width: 100%;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+      }
+  
+      button {
+        background-color: #0054FA;
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+  
+        &:hover {
+          background-color: #003BB8;
+        }
+  
+        &:disabled {
+          background-color: #ccc;
+          cursor: not-allowed;
+        }
+      }
+    }
+  
+    .right-column {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+  
+      .canvas-container {
+        .twitter-canvases,
+        .mobile-canvases {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 2rem;
+  
+          .canvas-item {
+            flex: 1;
+            max-width: 100%; /* Default: Four canvases per row */
+            text-align: center;
+  
+            canvas {
+              display: block;
+              margin: 0 auto;
+              max-width: 100%;
+            }
+  
+            button {
+              margin-top: 0.5rem;
+              padding: 0.5rem 1rem;
+              background-color: #0054FA;
+              color: white;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+              transition: background-color 0.3s;
+  
+              &:hover {
+                background-color: #003BB8;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  /* Breakpoints */
+  @media (max-width: 1200px) {
+    .right-column .canvas-container .canvas-item {
+      max-width: 100%; /* Two canvases per row */
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .generator-container {
+      flex-direction: column;
+      align-items: center;
+  
+      .left-column,
+      .right-column {
+        max-width: 100%;
+      }
+  
+      .canvas-container {
+        .twitter-canvases,
+        .mobile-canvases {
+          .canvas-item {
+            max-width: 100%; /* Two canvases per row */
+          }
+        }
+      }
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .canvas-container {
+      .twitter-canvases,
+      .mobile-canvases {
+        display: flex;
+        flex-wrap: nowrap;
+        flex-direction: column;
+        align-content: stretch;
+        align-items: stretch;
+        gap: 2rem;
+  
+        .canvas-item {
+          max-width: 100%;
+          flex: 1 1;
+          text-align: center;
+  
+          canvas {
+            width: 100%;
+            max-width: 100%; /* Ensure canvas takes full width */
+          }
+  
+          button {
+            width: 100%; /* Ensure button takes full width */
+          }
+        }
+      }
+    }
+  }
+  
