@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import { fetchNFTMetadata } from '../utils/api.js';
 import { collections, specialMutantApeTokens } from '../utils/constants.js';
 import { colorDistance } from '../utils/helpers.js';
 import CanvasPreview from '../components/CanvasPreview.js';
@@ -27,6 +26,7 @@ function NFTGenerator() {
     { name: 'black', color: '#000000', logo: '/apechain-logo-white.svg' },
     { name: 'apechain', color: '#0054FA', logo: '/apechain-logo-white.svg' },
   ];
+
   const handleGenerate = async () => {
     if (!collection || !nftID) {
       alert("Please select a collection and enter an NFT ID.");
@@ -35,9 +35,19 @@ function NFTGenerator() {
     setLoading(true);
     setIsButtonDisabled(true); // Disable button after generating
     try {
-      const data = await fetchNFTMetadata(collection, nftID);
-      setMetadata(data);
-      generateImages(data);
+      const response = await fetch('/.netlify/functions/fetchNFTMetadata', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ collection, nftID }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch metadata');
+      }
+
+      const data = await response.json();
+      setMetadata(data); // Use metadata if needed in other parts of your component
+      generateImages(data); // Proceed with generating the images
     } catch (error) {
       console.error('Error fetching metadata:', error);
       alert('Failed to fetch metadata. Please try again.');
@@ -45,6 +55,7 @@ function NFTGenerator() {
       setLoading(false);
     }
   };
+
   const generateImages = (data) => {
     const imageURL =
       collection === '0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D'
@@ -83,6 +94,7 @@ function NFTGenerator() {
       });
     };
   };
+
   const drawOnCanvas = (type, option, canvas, width, height, defaultBgColor, nftImage, offscreenCanvas) => {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -118,21 +130,24 @@ function NFTGenerator() {
       }
     };
   };
+
   const downloadCanvas = (canvas, filename) => {
     const link = document.createElement('a');
     link.href = canvas.toDataURL('image/png');
     link.download = filename;
     link.click();
   };
+
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
   const handleNftIdChange = (e) => {
     setNftID(e.target.value);
     setIsButtonDisabled(false); // Enable button when user interacts with text field
   };
+
   return (
     <div>
       <h1>NFT Generator</h1>
-      {/* Add content and functionality for the NFT generator */}
       <select value={collection} onChange={(e) => setCollection(e.target.value)}>
         <option value="">Select Collection</option>
         {collections.map((col) => (
@@ -170,13 +185,6 @@ function NFTGenerator() {
           </div>
         ))}
       </div>
-      <style jsx>{`
-        .canvas-container { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 20px; }
-        .canvas-wrapper { text-align: center; }
-        .responsive-canvas { width: 100%; max-width: 500px; height: auto; border: 1px solid #000; }
-        button { margin-top: 10px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
-      `}</style>
     </div>
   );
 }
