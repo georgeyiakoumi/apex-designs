@@ -1,5 +1,5 @@
 import React from 'react';
-import NFTGenerator from './pages/NFTGenerator';
+import NFTGenerator from './pages/NFTGenerator.js';
 
 function App() {
   return (
