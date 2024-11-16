@@ -1,11 +1,7 @@
 import React from 'react';
-<<<<<<< HEAD
-import NFTGenerator from './pages/NFTGenerator.js';
-=======
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './pages/Home';
-import NFTGenerator from './pages/NFTGenerator';
->>>>>>> parent of 0e4c870 (adding the build)
+import Home from './pages/Home.js';
+import NFTGenerator from './pages/NFTGenerator.js';
 
 function App() {
   return (
