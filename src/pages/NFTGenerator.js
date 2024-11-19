@@ -67,31 +67,34 @@ function NFTGenerator() {
   
 
   const generateImages = (data) => {
-    const imageURL =
-      collection === '0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D'
-        ? `https://ipfs.io/ipfs/QmQ6VgRFiVTdKbiebxGvhW3Wa3Lkhpe6SkWBPjGnPkTttS/${nftID}.png`
+    const imageURL = collection === '0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D'
+      ? `https://ipfs.io/ipfs/QmQ6VgRFiVTdKbiebxGvhW3Wa3Lkhpe6SkWBPjGnPkTttS/${nftID}.png`
+      : collection === '0xEdB61f74B0d09B2558F1eeb79B247c1F363Ae452'
+        ? `https://gutter-cats-metadata.s3.us-east-2.amazonaws.com/metadata/images/${nftID}.png`
         : data.metadata.image.startsWith('ipfs://')
           ? data.metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/')
           : data.metadata.image;
+  
     const nftImage = new Image();
     nftImage.src = imageURL;
     nftImage.crossOrigin = 'Anonymous';
+  
     nftImage.onload = () => {
       const offscreenCanvas = document.createElement('canvas');
       const offscreenCtx = offscreenCanvas.getContext('2d');
       offscreenCanvas.width = nftImage.width;
       offscreenCanvas.height = nftImage.height;
       offscreenCtx.drawImage(nftImage, 0, 0);
-
+  
       const topMiddleColor = offscreenCtx.getImageData(nftImage.width / 2, 0, 1, 1).data;
       const defaultBgColor = `#${((1 << 24) + (topMiddleColor[0] << 16) + (topMiddleColor[1] << 8) + topMiddleColor[2]).toString(16).slice(1)}`;
       const [r, g, b] = topMiddleColor;
-
+  
       const backgroundName = data.metadata.attributes.find(attr => attr.trait_type === 'Background')?.value;
       const useWhiteLogo = [
         'Purple', 'M1 Purple', 'M2 Purple', 'Army Green', 'New Punk Blue', 'M1 New Punk Blue', 'M2 New Punk Blue'
       ].includes(backgroundName);
-
+  
       const backgroundToleranceMap = {
         Yellow: 10,
         Blue: 10,
@@ -102,14 +105,12 @@ function NFTGenerator() {
         Aquamarine: 10,
         'Army Green': 10,
         'New Punk Blue': 10,
-
       };
-      
+  
       const tolerance = (collection === '0x60E4d786628Fea6478F785A6d7e704777c86a7c6' && specialMutantApeTokens.includes(nftID))
         ? 80
         : backgroundToleranceMap[backgroundName] || 50;
-        
-
+  
       const imageData = offscreenCtx.getImageData(0, 0, nftImage.width, nftImage.height);
       for (let i = 0; i < imageData.data.length; i += 4) {
         const pixelR = imageData.data[i];
@@ -120,20 +121,26 @@ function NFTGenerator() {
         }
       }
       offscreenCtx.putImageData(imageData, 0, 0);
-
+  
       backgroundOptions.forEach(option => {
         let logoSrc = option.logo;
-
+  
         // Override logo selection only for the original background
         if (option.name === 'original') {
           logoSrc = useWhiteLogo ? '/apechain-logo-white.svg' : '/apechain-logo-black.svg';
         }
-
+  
         drawOnCanvas('twitter', option, canvasRefs.current[`twitter${capitalize(option.name)}`], 1500, 500, defaultBgColor, nftImage, offscreenCanvas, logoSrc);
         drawOnCanvas('mobile', option, canvasRefs.current[`mobile${capitalize(option.name)}`], 430, 932, defaultBgColor, nftImage, offscreenCanvas, logoSrc);
       });
     };
+  
+    nftImage.onerror = () => {
+      console.error('Failed to load image:', imageURL);
+      alert('Failed to load NFT image. Please check the NFT ID or collection.');
+    };
   };
+  
 
   const drawOnCanvas = (type, option, canvas, width, height, defaultBgColor, nftImage, offscreenCanvas, logoSrc) => {
     if (!canvas) return;
