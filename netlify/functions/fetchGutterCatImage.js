@@ -1,5 +1,3 @@
-const fetch = require('node-fetch');
-
 exports.handler = async (event) => {
   try {
     const { nftID } = event.queryStringParameters;
@@ -20,15 +18,16 @@ exports.handler = async (event) => {
       throw new Error(`Failed to fetch image: ${response.statusText}`);
     }
 
-    const imageBuffer = await response.buffer();
+    const imageBuffer = await response.arrayBuffer();
+    console.log('Successfully fetched Gutter Cat image.');
 
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'image/png',
-        'Access-Control-Allow-Origin': '*', // Add CORS header
+        'Access-Control-Allow-Origin': '*', // Enable CORS
       },
-      body: imageBuffer.toString('base64'),
+      body: Buffer.from(imageBuffer).toString('base64'),
       isBase64Encoded: true,
     };
   } catch (error) {

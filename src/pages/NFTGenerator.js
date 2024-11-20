@@ -35,35 +35,68 @@ function NFTGenerator() {
   
     setLoading(true);
     setIsButtonDisabled(true); // Disable button after generating
+  
     try {
-      console.log('Sending to backend:', { collection, nftID }); // Log the request data
+      if (collection === '0xEdB61f74B0d09B2558F1eeb79B247c1F363Ae452') {
+        // Gutter Cat Gang logic: Call fetchGutterCatImage function
+        console.log('Gutter Cat Gang collection detected. Calling fetchGutterCatImage.');
+        
+        const response = await fetch(`/.netlify/functions/fetchGutterCatImage?nftID=${nftID}`, {
+          method: 'GET',
+        });
   
-      const response = await fetch('/.netlify/functions/fetchNFTMetadata', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ collection, nftID }), // No chain sent, backend determines it
-      });
+        console.log('Received response from fetchGutterCatImage:', response);
   
-      console.log('Received response from backend:', response); // Log the full response object
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Backend error response (fetchGutterCatImage):', errorData);
+          throw new Error(errorData.error || 'Unknown error');
+        }
   
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Backend error response:', errorData); // Log backend error message
-        throw new Error(errorData.error || 'Unknown error');
+        const base64Image = await response.text();
+        console.log('Successfully fetched Gutter Cat Gang image.');
+  
+        // Create a mock metadata object to pass to generateImages
+        const gutterMetadata = {
+          metadata: {
+            image: `data:image/png;base64,${base64Image}`, // Use base64 image
+            attributes: [{ trait_type: 'Background', value: null }], // No background info for Gutter Cat Gang
+          },
+        };
+  
+        generateImages(gutterMetadata);
+      } else {
+        // Other collections: Call fetchNFTMetadata function
+        console.log('Sending to backend fetchNFTMetadata:', { collection, nftID });
+  
+        const response = await fetch('/.netlify/functions/fetchNFTMetadata', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ collection, nftID }),
+        });
+  
+        console.log('Received response from fetchNFTMetadata:', response);
+  
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Backend error response (fetchNFTMetadata):', errorData);
+          throw new Error(errorData.error || 'Unknown error');
+        }
+  
+        const data = await response.json();
+        console.log('Successfully fetched metadata (fetchNFTMetadata):', data);
+  
+        setMetadata(data);
+        generateImages(data);
       }
-  
-      const data = await response.json();
-      console.log('Successfully fetched metadata:', data); // Log the successful data
-  
-      setMetadata(data);
-      generateImages(data);
     } catch (error) {
-      console.error('Error in handleGenerate:', error); // Log the full error
-      alert('Failed to fetch metadata. Please try again.');
+      console.error('Error in handleGenerate:', error);
+      alert('Failed to fetch metadata or image. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+  
   
 
   const generateImages = (data) => {
