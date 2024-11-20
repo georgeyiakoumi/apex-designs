@@ -8,6 +8,8 @@ directory = "netlify/functions" # Path to your serverless functions folder
 
 [dev]
 framework = "create-react-app" # Optional: specify the dev framework for `netlify dev`
+functions = "netlify/functions"
+
 
 [[redirects]]
 from = "/*"
